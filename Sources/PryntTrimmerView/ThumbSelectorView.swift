@@ -48,7 +48,7 @@ public class ThumbSelectorView: AVAssetTimeSelector {
 
         dimmingView.translatesAutoresizingMaskIntoConstraints = false
         dimmingView.isUserInteractionEnabled = false
-        dimmingView.backgroundColor = UIColor.white.withAlphaComponent(0.7)
+        dimmingView.backgroundColor = UIColor.white
         addSubview(dimmingView)
         dimmingView.leftAnchor.constraint(equalTo: leftAnchor).isActive = true
         dimmingView.rightAnchor.constraint(equalTo: rightAnchor).isActive = true
@@ -160,7 +160,7 @@ public class ThumbSelectorView: AVAssetTimeSelector {
     /// The currently selected time of the asset.
     public var selectedTime: CMTime? {
         let thumbPosition = thumbView.center.x + assetPreview.contentOffset.x - (thumbView.frame.width / 2)
-        return getTime(from: thumbPosition)
+        return getTime(from: thumbPosition, duration: .zero)
     }
 
     private func updateSelectedTime() {

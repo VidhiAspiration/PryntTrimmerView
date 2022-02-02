@@ -78,16 +78,16 @@ public class AVAssetTimeSelector: UIView, UIScrollViewDelegate {
         return assetPreview.contentSize.width
     }
 
-    func getTime(from position: CGFloat) -> CMTime? {
+    func getTime(from position: CGFloat,duration: CMTime) -> CMTime? {
         guard let asset = asset else {
             return nil
         }
         let normalizedRatio = max(min(1, position / durationSize), 0)
-        let positionTimeValue = Double(normalizedRatio) * Double(asset.duration.value)
-        return CMTime(value: Int64(positionTimeValue), timescale: asset.duration.timescale)
+        let positionTimeValue = Double(normalizedRatio) * Double(duration.value)
+        return CMTime(value: Int64(positionTimeValue), timescale: duration.timescale)
     }
 
-    func getPosition(from time: CMTime) -> CGFloat? {
+    func getPosition(from time: CMTime,duration: CMTime) -> CGFloat? {
         guard let asset = asset else {
             return nil
         }

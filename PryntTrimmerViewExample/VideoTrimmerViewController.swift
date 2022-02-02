@@ -51,6 +51,8 @@ class VideoTrimmerViewController: AssetSelectionViewController {
 
         trimmerView.asset = asset
         trimmerView.delegate = self
+        trimmerView.bgColor = .white
+        trimmerView.duration = CMTime(seconds: asset.duration.seconds, preferredTimescale: 1000)
         addVideoPlayer(with: asset, playerView: playerView)
     }
 
@@ -109,17 +111,17 @@ class VideoTrimmerViewController: AssetSelectionViewController {
 }
 
 extension VideoTrimmerViewController: TrimmerViewDelegate {
-    func positionBarStoppedMoving(_ playerTime: CMTime) {
+    func positionBarStoppedMoving(_ playerTime: CMTime, StartTime: CMTime, EndTime: CMTime, leftConst: CGFloat, rightConst: CGFloat) {
         player?.seek(to: playerTime, toleranceBefore: CMTime.zero, toleranceAfter: CMTime.zero)
         player?.play()
         startPlaybackTimeChecker()
     }
 
-    func didChangePositionBar(_ playerTime: CMTime) {
+    func didChangePositionBar(_ playerTime: CMTime, StartTime: CMTime, EndTime: CMTime, leftConst: CGFloat, rightConst: CGFloat) {
         stopPlaybackTimeChecker()
         player?.pause()
         player?.seek(to: playerTime, toleranceBefore: CMTime.zero, toleranceAfter: CMTime.zero)
         let duration = (trimmerView.endTime! - trimmerView.startTime!).seconds
-        print(duration)
+        print(leftConst)
     }
 }

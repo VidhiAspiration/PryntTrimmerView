@@ -10,8 +10,8 @@ import AVFoundation
 import UIKit
 
 public protocol TrimmerViewDelegate: AnyObject {
-    func didChangePositionBar(_ playerTime: CMTime)
-    func positionBarStoppedMoving(_ playerTime: CMTime)
+    func didChangePositionBar(_ playerTime: CMTime, StartTime: CMTime, EndTime: CMTime, leftConst: CGFloat, rightConst: CGFloat)
+    func positionBarStoppedMoving(_ playerTime: CMTime, StartTime: CMTime, EndTime: CMTime, leftConst: CGFloat, rightConst: CGFloat)
 }
 
 /// A view to select a specific time range of a video. It consists of an asset preview with thumbnails inside a scroll view, two
@@ -57,6 +57,8 @@ public protocol TrimmerViewDelegate: AnyObject {
     // MARK: Interface
 
     public weak var delegate: TrimmerViewDelegate?
+    public var duration = CMTime.zero
+    public var bgColor: UIColor = .white
 
     // MARK: Subviews
 
@@ -88,7 +90,7 @@ public protocol TrimmerViewDelegate: AnyObject {
         super.setupSubviews()
         layer.cornerRadius = 2
         layer.masksToBounds = true
-        backgroundColor = UIColor.clear
+        backgroundColor = self.bgColor
         layer.zPosition = 1
         setupTrimmerView()
         setupHandleView()
@@ -285,7 +287,7 @@ public protocol TrimmerViewDelegate: AnyObject {
 
     /// Move the position bar to the given time.
     public func seek(to time: CMTime) {
-        if let newPosition = getPosition(from: time) {
+        if let newPosition = getPosition(from: time, duration: self.duration) {
 
             let offsetPosition = newPosition - assetPreview.contentOffset.x - leftHandleView.frame.origin.x
             let maxPosition = rightHandleView.frame.origin.x - (leftHandleView.frame.origin.x + handleWidth)
@@ -299,13 +301,14 @@ public protocol TrimmerViewDelegate: AnyObject {
     /// The selected start time for the current asset.
     public var startTime: CMTime? {
         let startPosition = leftHandleView.frame.origin.x + assetPreview.contentOffset.x
-        return getTime(from: startPosition)
+        return getTime(from: startPosition, duration: self.duration)
     }
 
     /// The selected end time for the current asset.
     public var endTime: CMTime? {
+        rightHandleView.layoutIfNeeded()
         let endPosition = rightHandleView.frame.origin.x + assetPreview.contentOffset.x - handleWidth
-        return getTime(from: endPosition)
+        return getTime(from: endPosition, duration: self.duration)
     }
 
     private func updateSelectedTime(stoppedMoving: Bool) {
@@ -313,20 +316,20 @@ public protocol TrimmerViewDelegate: AnyObject {
             return
         }
         if stoppedMoving {
-            delegate?.positionBarStoppedMoving(playerTime)
+            delegate?.positionBarStoppedMoving(playerTime, StartTime: startTime!, EndTime: endTime!, leftConst: leftConstraint!.constant, rightConst: rightConstraint!.constant)
         } else {
-            delegate?.didChangePositionBar(playerTime)
+            delegate?.didChangePositionBar(playerTime, StartTime: startTime!, EndTime: endTime!, leftConst: leftConstraint!.constant, rightConst: rightConstraint!.constant)
         }
     }
 
     private var positionBarTime: CMTime? {
         let barPosition = positionBar.frame.origin.x + assetPreview.contentOffset.x - handleWidth
-        return getTime(from: barPosition)
+        return getTime(from: barPosition, duration: self.duration)
     }
 
     private var minimumDistanceBetweenHandle: CGFloat {
         guard let asset = asset else { return 0 }
-        return CGFloat(minDuration) * assetPreview.contentView.frame.width / CGFloat(asset.duration.seconds)
+        return CGFloat(minDuration) * assetPreview.contentView.frame.width / CGFloat(duration.seconds)
     }
 
     // MARK: - Scroll View Delegate
