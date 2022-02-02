@@ -58,7 +58,7 @@ public protocol TrimmerViewDelegate: AnyObject {
 
     public weak var delegate: TrimmerViewDelegate?
     public var duration = CMTime.zero
-    public var bgColor: UIColor = .white
+    public var bgAlphaColor: 0.7
 
     // MARK: Subviews
 
@@ -90,7 +90,7 @@ public protocol TrimmerViewDelegate: AnyObject {
         super.setupSubviews()
         layer.cornerRadius = 2
         layer.masksToBounds = true
-        backgroundColor = self.bgColor
+        backgroundColor = .white
         layer.zPosition = 1
         setupTrimmerView()
         setupHandleView()
@@ -166,7 +166,7 @@ public protocol TrimmerViewDelegate: AnyObject {
 
         leftMaskView.isUserInteractionEnabled = false
         leftMaskView.backgroundColor = .white
-        leftMaskView.alpha = 0.7
+        leftMaskView.alpha = self.bgAlphaColor
         leftMaskView.translatesAutoresizingMaskIntoConstraints = false
         insertSubview(leftMaskView, belowSubview: leftHandleView)
 
@@ -177,7 +177,7 @@ public protocol TrimmerViewDelegate: AnyObject {
 
         rightMaskView.isUserInteractionEnabled = false
         rightMaskView.backgroundColor = .white
-        rightMaskView.alpha = 0.7
+        rightMaskView.alpha = self.bgAlphaColor
         rightMaskView.translatesAutoresizingMaskIntoConstraints = false
         insertSubview(rightMaskView, belowSubview: rightHandleView)
 
