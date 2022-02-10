@@ -38,6 +38,25 @@ public protocol TrimmerViewDelegate: AnyObject {
            updateHandleColor()
         }
     }
+    
+    @IBInspectable public var isMove: Bool = true {
+        didSet {
+            if isMove {
+                setupGestures()
+            } else {
+                if leftHandleView.gestureRecognizers != nil {
+                    for i in leftHandleView.gestureRecognizers! {
+                        leftHandleView.removeGestureRecognizer(i)
+                    }
+                }
+                if rightHandleView.gestureRecognizers != nil {
+                    for i in rightHandleView.gestureRecognizers! {
+                        rightHandleView.removeGestureRecognizer(i)
+                    }
+                }
+            }
+        }
+    }
 
     /// The color of the position indicator
     @IBInspectable public var positionBarColor: UIColor = UIColor.white {
@@ -58,8 +77,7 @@ public protocol TrimmerViewDelegate: AnyObject {
 
     public weak var delegate: TrimmerViewDelegate?
     public var duration = CMTime.zero
-    public var bgAlphaColor: 0.7
-
+    
     // MARK: Subviews
 
     private let trimView = UIView()
@@ -70,6 +88,7 @@ public protocol TrimmerViewDelegate: AnyObject {
     private let rightHandleKnob = UIView()
     private let leftMaskView = UIView()
     private let rightMaskView = UIView()
+    private let imgView = UIImageView()
 
     // MARK: Constraints
 
@@ -78,6 +97,7 @@ public protocol TrimmerViewDelegate: AnyObject {
     private var leftConstraint: NSLayoutConstraint?
     private var rightConstraint: NSLayoutConstraint?
     private var positionConstraint: NSLayoutConstraint?
+    private var imageLeftConstraint: NSLayoutConstraint?
 
     private let handleWidth: CGFloat = 15
 
@@ -96,14 +116,14 @@ public protocol TrimmerViewDelegate: AnyObject {
         setupHandleView()
         setupMaskView()
         setupPositionBar()
-        setupGestures()
         updateMainColor()
         updateHandleColor()
+//        setupImageView()
     }
 
     override func constrainAssetPreview() {
-        assetPreview.leftAnchor.constraint(equalTo: leftAnchor, constant: handleWidth).isActive = true
-        assetPreview.rightAnchor.constraint(equalTo: rightAnchor, constant: -handleWidth).isActive = true
+        assetPreview.leftAnchor.constraint(equalTo: leftAnchor).isActive = true
+        assetPreview.rightAnchor.constraint(equalTo: rightAnchor).isActive = true
         assetPreview.topAnchor.constraint(equalTo: topAnchor).isActive = true
         assetPreview.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
     }
@@ -165,8 +185,7 @@ public protocol TrimmerViewDelegate: AnyObject {
     private func setupMaskView() {
 
         leftMaskView.isUserInteractionEnabled = false
-        leftMaskView.backgroundColor = .white
-        leftMaskView.alpha = self.bgAlphaColor
+        leftMaskView.backgroundColor = .white.withAlphaComponent(0.7)
         leftMaskView.translatesAutoresizingMaskIntoConstraints = false
         insertSubview(leftMaskView, belowSubview: leftHandleView)
 
@@ -176,8 +195,7 @@ public protocol TrimmerViewDelegate: AnyObject {
         leftMaskView.rightAnchor.constraint(equalTo: leftHandleView.centerXAnchor).isActive = true
 
         rightMaskView.isUserInteractionEnabled = false
-        rightMaskView.backgroundColor = .white
-        rightMaskView.alpha = self.bgAlphaColor
+        rightMaskView.backgroundColor = .white.withAlphaComponent(0.7)
         rightMaskView.translatesAutoresizingMaskIntoConstraints = false
         insertSubview(rightMaskView, belowSubview: rightHandleView)
 
@@ -185,6 +203,17 @@ public protocol TrimmerViewDelegate: AnyObject {
         rightMaskView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
         rightMaskView.topAnchor.constraint(equalTo: topAnchor).isActive = true
         rightMaskView.leftAnchor.constraint(equalTo: rightHandleView.centerXAnchor).isActive = true
+    }
+    
+    func setupImageView() {
+        imgView.frame = CGRect(x: 10, y: 0, width: 30, height: 30)
+        addSubview(imgView)
+
+        imgView.image = UIImage(named: "ic_select1")
+        self.imageLeftConstraint = self.imgView.leftAnchor.constraint(equalTo: leftHandleView.rightAnchor, constant: 0)
+        self.imageLeftConstraint?.isActive = true
+        imgView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+        imgView.heightAnchor.constraint(equalToConstant: 30).isActive = true
     }
 
     private func setupPositionBar() {
@@ -262,6 +291,7 @@ public protocol TrimmerViewDelegate: AnyObject {
         let maxConstraint = max(rightHandleView.frame.origin.x - handleWidth - minimumDistanceBetweenHandle, 0)
         let newConstraint = min(max(0, currentLeftConstraint + translation.x), maxConstraint)
         leftConstraint?.constant = newConstraint
+        self.imageLeftConstraint?.constant = newConstraint+25
     }
 
     private func updateRightConstraint(with translation: CGPoint) {
@@ -328,7 +358,7 @@ public protocol TrimmerViewDelegate: AnyObject {
     }
 
     private var minimumDistanceBetweenHandle: CGFloat {
-        guard let asset = asset else { return 0 }
+//        guard let asset = asset else { return 0 }
         return CGFloat(minDuration) * assetPreview.contentView.frame.width / CGFloat(duration.seconds)
     }
 

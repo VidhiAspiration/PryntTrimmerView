@@ -52,7 +52,7 @@ class AssetVideoScrollView: UIScrollView {
     }
 
     internal func regenerateThumbnails(for asset: AVAsset) {
-        guard let thumbnailSize = getThumbnailFrameSize(from: asset), thumbnailSize.width != 0 else {
+        guard let thumbnailSize = getThumbnailFrameSize(from: asset) else {
             print("Could not calculate the thumbnail size.")
             return
         }
@@ -71,6 +71,10 @@ class AssetVideoScrollView: UIScrollView {
         guard let track = asset.tracks(withMediaType: AVMediaType.video).first else { return nil}
 
         let assetSize = track.naturalSize.applying(track.preferredTransform)
+
+        if frame.height == 0 {
+            frame.size.height = 50
+        }
 
         let height = frame.height
         let ratio = assetSize.width / assetSize.height

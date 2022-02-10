@@ -20,6 +20,7 @@ class VideoTrimmerViewController: AssetSelectionViewController {
     @IBOutlet weak var playerView: UIView!
     @IBOutlet weak var trimmerView: TrimmerView!
 
+    @IBOutlet weak var viewWidthConstraint: NSLayoutConstraint!
     var player: AVPlayer?
     var playbackTimeCheckerTimer: Timer?
     var trimmerPositionChangedTimer: Timer?
@@ -51,7 +52,8 @@ class VideoTrimmerViewController: AssetSelectionViewController {
 
         trimmerView.asset = asset
         trimmerView.delegate = self
-        trimmerView.bgColor = .white
+        trimmerView.contentFrame = self.trimmerView.frame
+        trimmerView.maxDuration = asset.duration.seconds
         trimmerView.duration = CMTime(seconds: asset.duration.seconds, preferredTimescale: 1000)
         addVideoPlayer(with: asset, playerView: playerView)
     }
@@ -108,6 +110,10 @@ class VideoTrimmerViewController: AssetSelectionViewController {
             trimmerView.seek(to: startTime)
         }
     }
+    
+    var finalLeftConst: CGFloat = 0.0
+    var finalRightConst: CGFloat = 0.0
+
 }
 
 extension VideoTrimmerViewController: TrimmerViewDelegate {
@@ -123,5 +129,12 @@ extension VideoTrimmerViewController: TrimmerViewDelegate {
         player?.seek(to: playerTime, toleranceBefore: CMTime.zero, toleranceAfter: CMTime.zero)
         let duration = (trimmerView.endTime! - trimmerView.startTime!).seconds
         print(leftConst)
+        
+        self.viewWidthConstraint.constant -= (leftConst-self.finalLeftConst)
+        self.finalLeftConst = leftConst
+        
+        self.viewWidthConstraint.constant -= (abs(rightConst)-abs(self.finalRightConst))
+        self.finalRightConst = rightConst
+
     }
 }
