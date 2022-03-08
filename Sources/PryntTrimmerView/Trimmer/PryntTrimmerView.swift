@@ -93,8 +93,8 @@ public protocol TrimmerViewDelegate: AnyObject {
 
     private var currentLeftConstraint: CGFloat = 0
     private var currentRightConstraint: CGFloat = 0
-    private var leftConstraint: NSLayoutConstraint?
-    private var rightConstraint: NSLayoutConstraint?
+    public var leftConstraint: NSLayoutConstraint?
+    public var rightConstraint: NSLayoutConstraint?
     private var positionConstraint: NSLayoutConstraint?
 
     private let handleWidth: CGFloat = 15
