@@ -73,7 +73,7 @@ class AssetVideoScrollView: UIScrollView {
         let assetSize = track.naturalSize.applying(track.preferredTransform)
 
         if frame.height == 0 {
-            frame.size.height = 50
+            frame.size.height = UIDevice.current.userInterfaceIdiom == .pad ? 80 : 50
         }
 
         let height = frame.height

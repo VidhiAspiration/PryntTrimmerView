@@ -88,7 +88,6 @@ public protocol TrimmerViewDelegate: AnyObject {
     private let rightHandleKnob = UIView()
     private let leftMaskView = UIView()
     private let rightMaskView = UIView()
-    private let imgView = UIImageView()
 
     // MARK: Constraints
 
@@ -97,7 +96,6 @@ public protocol TrimmerViewDelegate: AnyObject {
     private var leftConstraint: NSLayoutConstraint?
     private var rightConstraint: NSLayoutConstraint?
     private var positionConstraint: NSLayoutConstraint?
-    private var imageLeftConstraint: NSLayoutConstraint?
 
     private let handleWidth: CGFloat = 15
 
@@ -118,7 +116,6 @@ public protocol TrimmerViewDelegate: AnyObject {
         setupPositionBar()
         updateMainColor()
         updateHandleColor()
-//        setupImageView()
     }
 
     override func constrainAssetPreview() {
@@ -205,17 +202,6 @@ public protocol TrimmerViewDelegate: AnyObject {
         rightMaskView.leftAnchor.constraint(equalTo: rightHandleView.centerXAnchor).isActive = true
     }
     
-    func setupImageView() {
-        imgView.frame = CGRect(x: 10, y: 0, width: 30, height: 30)
-        addSubview(imgView)
-
-        imgView.image = UIImage(named: "ic_select1")
-        self.imageLeftConstraint = self.imgView.leftAnchor.constraint(equalTo: leftHandleView.rightAnchor, constant: 0)
-        self.imageLeftConstraint?.isActive = true
-        imgView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
-        imgView.heightAnchor.constraint(equalToConstant: 30).isActive = true
-    }
-
     private func setupPositionBar() {
 
         positionBar.frame = CGRect(x: 0, y: 0, width: 3, height: frame.height)
@@ -291,7 +277,6 @@ public protocol TrimmerViewDelegate: AnyObject {
         let maxConstraint = max(rightHandleView.frame.origin.x - handleWidth - minimumDistanceBetweenHandle, 0)
         let newConstraint = min(max(0, currentLeftConstraint + translation.x), maxConstraint)
         leftConstraint?.constant = newConstraint
-        self.imageLeftConstraint?.constant = newConstraint+25
     }
 
     private func updateRightConstraint(with translation: CGPoint) {
