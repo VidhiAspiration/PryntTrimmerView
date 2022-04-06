@@ -322,7 +322,7 @@ public protocol TrimmerViewDelegate: AnyObject {
     /// The selected end time for the current asset.
     public var endTime: CMTime? {
         rightHandleView.layoutIfNeeded()
-        let endPosition = rightHandleView.frame.origin.x + assetPreview.contentOffset.x - handleWidth
+        let endPosition = rightHandleView.frame.maxX + assetPreview.contentOffset.x //- handleWidth
         return getTime(from: endPosition, duration: self.duration)
     }
 
