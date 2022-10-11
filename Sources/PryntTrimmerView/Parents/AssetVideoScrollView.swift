@@ -51,7 +51,7 @@ class AssetVideoScrollView: UIScrollView {
         contentSize = contentView.bounds.size
     }
 
-    internal func regenerateThumbnails(for asset: AVAsset) {
+    internal func regenerateThumbnails(for asset: AVAsset, duration: Float! = 1.0) {
         guard let thumbnailSize = getThumbnailFrameSize(from: asset) else {
             print("Could not calculate the thumbnail size.")
             return
@@ -59,7 +59,7 @@ class AssetVideoScrollView: UIScrollView {
 
         generator?.cancelAllCGImageGeneration()
         removeFormerThumbnails()
-        let newContentSize = setContentSize(for: asset)
+        let newContentSize = setContentSize(for: asset, duration: duration)
         let visibleThumbnailsCount = Int(ceil(frame.width / thumbnailSize.width))
         let thumbnailCount = Int(ceil(newContentSize.width / thumbnailSize.width))
         addThumbnailViews(thumbnailCount, size: thumbnailSize)
@@ -77,7 +77,7 @@ class AssetVideoScrollView: UIScrollView {
         }
 
         let height = frame.height
-        let ratio = assetSize.width / assetSize.height
+        let ratio = (assetSize.width) / (assetSize.height)
         let width = height * ratio
         return CGSize(width: abs(width), height: abs(height))
     }
@@ -86,9 +86,9 @@ class AssetVideoScrollView: UIScrollView {
         contentView.subviews.forEach({ $0.removeFromSuperview() })
     }
 
-    private func setContentSize(for asset: AVAsset) -> CGSize {
+    private func setContentSize(for asset: AVAsset, duration: Float! = 1.0) -> CGSize {
 
-        let contentWidthFactor = CGFloat(max(1, asset.duration.seconds / maxDuration))
+        let contentWidthFactor = CGFloat(max(1,( asset.duration.seconds) / maxDuration))
         widthConstraint?.isActive = false
         widthConstraint = contentView.widthAnchor.constraint(equalTo: widthAnchor, multiplier: contentWidthFactor)
         widthConstraint?.isActive = true
