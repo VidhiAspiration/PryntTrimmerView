@@ -72,6 +72,18 @@ public protocol TrimmerViewDelegate: AnyObject {
             rightMaskView.backgroundColor = maskColor
         }
     }
+    
+    @IBInspectable public var leftImage: String = "ic_slider_1" {
+        didSet {
+            leftImageView.image = UIImage(named: leftImage)
+        }
+    }
+
+    @IBInspectable public var righttImage: String = "ic_slider_2" {
+        didSet {
+            rightImageView.image = UIImage(named: righttImage)
+        }
+    }
 
     // MARK: Interface
 
@@ -81,13 +93,16 @@ public protocol TrimmerViewDelegate: AnyObject {
     // MARK: Subviews
 
     private let trimView = UIView()
-    private let leftHandleView = HandlerView()
-    private let rightHandleView = HandlerView()
+    public let leftHandleView = HandlerView()
+    public let rightHandleView = HandlerView()
     private let positionBar = UIView()
     private let leftHandleKnob = UIView()
     private let rightHandleKnob = UIView()
     private let leftMaskView = UIView()
     private let rightMaskView = UIView()
+
+    public let leftImageView = UIImageView()
+    public let rightImageView = UIImageView()
 
     // MARK: Constraints
 
@@ -107,7 +122,7 @@ public protocol TrimmerViewDelegate: AnyObject {
     override func setupSubviews() {
         super.setupSubviews()
         layer.cornerRadius = 2
-        layer.masksToBounds = true
+        layer.masksToBounds = false
         backgroundColor = .white
         layer.zPosition = 1
         setupTrimmerView()
@@ -116,6 +131,18 @@ public protocol TrimmerViewDelegate: AnyObject {
         setupPositionBar()
         updateMainColor()
         updateHandleColor()
+    }
+    
+    public func setupHandleImage() {
+        let width = leftHandleView.frame.width
+        let height = leftHandleView.frame.height
+        leftImageView.frame = CGRect(x: -width/2, y: 10, width: width, height: height-20)
+        leftHandleView.addSubview(leftImageView)
+        
+        let width1 = rightHandleView.frame.width
+        let height1 = rightHandleView.frame.height
+        rightImageView.frame = CGRect(x: width/2, y: 10, width: width1, height: height1-20)
+        rightHandleView.addSubview(rightImageView)
     }
 
     override func constrainAssetPreview() {
@@ -189,7 +216,7 @@ public protocol TrimmerViewDelegate: AnyObject {
         leftMaskView.leftAnchor.constraint(equalTo: leftAnchor).isActive = true
         leftMaskView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
         leftMaskView.topAnchor.constraint(equalTo: topAnchor).isActive = true
-        leftMaskView.rightAnchor.constraint(equalTo: leftHandleView.centerXAnchor).isActive = true
+        leftMaskView.rightAnchor.constraint(equalTo: leftHandleView.leftAnchor).isActive = true
 
         rightMaskView.isUserInteractionEnabled = false
         rightMaskView.backgroundColor = .white.withAlphaComponent(0.7)
@@ -199,7 +226,7 @@ public protocol TrimmerViewDelegate: AnyObject {
         rightMaskView.rightAnchor.constraint(equalTo: rightAnchor).isActive = true
         rightMaskView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
         rightMaskView.topAnchor.constraint(equalTo: topAnchor).isActive = true
-        rightMaskView.leftAnchor.constraint(equalTo: rightHandleView.centerXAnchor).isActive = true
+        rightMaskView.leftAnchor.constraint(equalTo: rightHandleView.rightAnchor).isActive = true
     }
     
     private func setupPositionBar() {
@@ -229,13 +256,13 @@ public protocol TrimmerViewDelegate: AnyObject {
 
     private func updateMainColor() {
         trimView.layer.borderColor = mainColor.cgColor
-        leftHandleView.backgroundColor = mainColor
-        rightHandleView.backgroundColor = mainColor
+//        leftHandleView.backgroundColor = mainColor
+//        rightHandleView.backgroundColor = mainColor
     }
 
     private func updateHandleColor() {
-        leftHandleKnob.backgroundColor = handleColor
-        rightHandleKnob.backgroundColor = handleColor
+//        leftHandleKnob.backgroundColor = handleColor
+//        rightHandleKnob.backgroundColor = handleColor
     }
 
     // MARK: - Trim Gestures
