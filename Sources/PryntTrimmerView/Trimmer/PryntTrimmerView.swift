@@ -84,6 +84,15 @@ public protocol TrimmerViewDelegate: AnyObject {
             rightImageView.image = UIImage(named: righttImage)
         }
     }
+    
+    @IBInspectable public var isthumbImageSet: Bool = false {
+        didSet {
+            leftHandleView.backgroundColor = mainColor
+            rightHandleView.backgroundColor = mainColor
+            leftImageView.image = nil
+            rightImageView.image = nil
+        }
+    }
 
     // MARK: Interface
 
@@ -261,8 +270,10 @@ public protocol TrimmerViewDelegate: AnyObject {
     }
 
     private func updateHandleColor() {
-//        leftHandleKnob.backgroundColor = handleColor
-//        rightHandleKnob.backgroundColor = handleColor
+        if isthumbImageSet {
+            leftHandleKnob.backgroundColor = handleColor
+            rightHandleKnob.backgroundColor = handleColor
+        }
     }
 
     // MARK: - Trim Gestures
