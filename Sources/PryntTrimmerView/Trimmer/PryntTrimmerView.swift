@@ -101,7 +101,7 @@ public protocol TrimmerViewDelegate: AnyObject {
     
     // MARK: Subviews
 
-    private let trimView = UIView()
+    public let trimView = UIView()
     public let leftHandleView = HandlerView()
     public let rightHandleView = HandlerView()
     private let positionBar = UIView()
