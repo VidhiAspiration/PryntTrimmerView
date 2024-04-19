@@ -21,6 +21,21 @@ public class AVAssetTimeSelector: UIView, UIScrollViewDelegate {
             assetPreview.maxDuration = maxDuration
         }
     }
+    
+    ///
+    public var thumnailHeight: Double = 50 {
+        didSet {
+            assetPreview.thumnailHeight = thumnailHeight
+        }
+    }
+   
+    ///
+    public var thumbnailWidth: Double = 50 {
+        didSet {
+            assetPreview.thumbnailWidth = thumbnailWidth
+        }
+    }
+
 
     /// The asset to be displayed in the underlying scroll view. Setting a new asset will automatically refresh the thumbnails.
     public var asset: AVAsset? {

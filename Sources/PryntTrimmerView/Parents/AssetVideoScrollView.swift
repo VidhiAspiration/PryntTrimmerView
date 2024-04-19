@@ -16,6 +16,9 @@ class AssetVideoScrollView: UIScrollView {
     let contentView = UIView()
     public var maxDuration: Double = 15
     private var generator: AVAssetImageGenerator?
+    
+    var thumnailHeight: CGFloat = 50
+    var thumbnailWidth: CGFloat = 50
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -73,13 +76,13 @@ class AssetVideoScrollView: UIScrollView {
         let assetSize = track.naturalSize.applying(track.preferredTransform)
 
         if frame.height == 0 {
-            frame.size.height = UIDevice.current.userInterfaceIdiom == .pad ? 80 : 50
+            frame.size.height = self.thumnailHeight
         }
 
         let height = frame.height
         let ratio = (assetSize.width) / (assetSize.height)
         let width = height * ratio
-        return CGSize(width: abs(width), height: abs(height))
+        return CGSize(width: abs(self.thumbnailWidth), height: abs(height))
     }
 
     private func removeFormerThumbnails() {
