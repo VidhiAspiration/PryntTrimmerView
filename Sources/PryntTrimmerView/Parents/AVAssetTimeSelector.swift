@@ -35,14 +35,20 @@ public class AVAssetTimeSelector: UIView, UIScrollViewDelegate {
             assetPreview.thumbnailWidth = thumbnailWidth
         }
     }
-
-
-    /// The asset to be displayed in the underlying scroll view. Setting a new asset will automatically refresh the thumbnails.
+   
     public var asset: AVAsset? {
         didSet {
             assetDidChange(newAsset: asset)
         }
     }
+
+    /// The asset to be displayed in the underlying scroll view. Setting a new asset will automatically refresh the thumbnails.
+//    public var asset: AVAsset? {
+//        didSet {
+//            assetDidChange(newAsset: asset)
+//        }
+//    }
+   
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -59,12 +65,12 @@ public class AVAssetTimeSelector: UIView, UIScrollViewDelegate {
         constrainAssetPreview()
     }
 
-    public func regenerateThumbnails(duration: Float) {
-        if let asset = asset {
-            assetPreview.regenerateThumbnails(for: asset, duration: duration)
-        }
-    }
-
+//    public func regenerateThumbnails(duration: Float) {
+//        if let asset = asset {
+//            assetPreview.regenerateThumbnails(for: asset, duration: duration)
+//        }
+//    }
+    
     // MARK: - Asset Preview
 
     func setupAssetPreview() {
@@ -81,9 +87,15 @@ public class AVAssetTimeSelector: UIView, UIScrollViewDelegate {
         assetPreview.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
     }
 
+//    func assetDidChange(newAsset: AVAsset?) {
+//        if let asset = newAsset {
+//            assetPreview.regenerateThumbnails(for: asset)
+//        }
+//    }
+    
     func assetDidChange(newAsset: AVAsset?) {
         if let asset = newAsset {
-            assetPreview.regenerateThumbnails(for: asset)
+            assetPreview.regenerateThumbnails(for: asset, startTime: 0.0)
         }
     }
 
@@ -102,6 +114,15 @@ public class AVAssetTimeSelector: UIView, UIScrollViewDelegate {
         return CMTime(value: Int64(positionTimeValue), timescale: duration.timescale)
     }
 
+//    func getPosition(from time: CMTime,duration: CMTime) -> CGFloat? {
+//        guard let asset = asset else {
+//            return nil
+//        }
+//        let timeRatio = CGFloat(time.value) * CGFloat(asset.duration.timescale) /
+//            (CGFloat(time.timescale) * CGFloat(asset.duration.value))
+//        return timeRatio * durationSize
+//    }
+    
     func getPosition(from time: CMTime,duration: CMTime) -> CGFloat? {
         guard let asset = asset else {
             return nil

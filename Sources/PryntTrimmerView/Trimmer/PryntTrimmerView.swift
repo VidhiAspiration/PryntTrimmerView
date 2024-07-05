@@ -145,12 +145,12 @@ public protocol TrimmerViewDelegate: AnyObject {
     public func setupHandleImage() {
         let width = leftHandleView.frame.width
         let height = leftHandleView.frame.height
-        leftImageView.frame = CGRect(x: -width/2, y: 10, width: width, height: height-20)
+        leftImageView.frame = CGRect(x: -width/2, y: 0, width: width, height: height)
         leftHandleView.addSubview(leftImageView)
         
         let width1 = rightHandleView.frame.width
         let height1 = rightHandleView.frame.height
-        rightImageView.frame = CGRect(x: width/2, y: 10, width: width1, height: height1-20)
+        rightImageView.frame = CGRect(x: width/2, y: 0, width: width1, height: height1)
         rightHandleView.addSubview(rightImageView)
     }
 
