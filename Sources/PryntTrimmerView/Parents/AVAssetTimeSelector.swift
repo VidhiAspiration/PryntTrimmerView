@@ -71,6 +71,12 @@ public class AVAssetTimeSelector: UIView, UIScrollViewDelegate {
 //        }
 //    }
     
+    public func regenerateThumbnails(duration: Float, startTime: Float64 = 0.0) {
+        if let asset = asset {
+            assetPreview.regenerateThumbnails(for: asset, startTime: startTime )
+        }
+    }
+    
     // MARK: - Asset Preview
 
     func setupAssetPreview() {
