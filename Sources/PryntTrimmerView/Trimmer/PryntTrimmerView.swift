@@ -93,6 +93,13 @@ public protocol TrimmerViewDelegate: AnyObject {
             rightImageView.image = nil
         }
     }
+        
+    //V
+    @IBInspectable public var positionBarWidth: Double = 3.0 {
+        didSet {
+            positionBarWidthConstraint?.constant = positionBarWidth
+        }
+    }
 
     // MARK: Interface
 
@@ -120,6 +127,8 @@ public protocol TrimmerViewDelegate: AnyObject {
     public var leftConstraint: NSLayoutConstraint?
     public var rightConstraint: NSLayoutConstraint?
     private var positionConstraint: NSLayoutConstraint?
+    //V
+    private var positionBarWidthConstraint: NSLayoutConstraint?
 
     private let handleWidth: CGFloat = 15
 
@@ -247,12 +256,56 @@ public protocol TrimmerViewDelegate: AnyObject {
         positionBar.translatesAutoresizingMaskIntoConstraints = false
         positionBar.isUserInteractionEnabled = false
         addSubview(positionBar)
+        
+        //Vi
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
+        self.addGestureRecognizer(tapGesture)
 
         positionBar.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
-        positionBar.widthAnchor.constraint(equalToConstant: 3).isActive = true
+        //V
+        positionBarWidthConstraint = positionBar.widthAnchor.constraint(equalToConstant: 3)
+        positionBarWidthConstraint?.isActive = true
         positionBar.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
         positionConstraint = positionBar.leftAnchor.constraint(equalTo: leftHandleView.rightAnchor, constant: 0)
         positionConstraint?.isActive = true
+    }
+    
+    @objc func handleTap(_ gestureRecognizer: UITapGestureRecognizer) {
+        let location = gestureRecognizer.location(in: self.superview)
+        let newX = location.x - (positionBar.frame.width / 2)
+
+        let minX = leftHandleView.frame.maxX
+        let maxX = rightHandleView.frame.minX - positionBar.frame.width
+        print("minX ==> \(minX), maxX ==> \(maxX)")
+
+        let clampedX = max(minX, min(newX, maxX))
+
+//        positionConstraint?.constant = clampedX
+
+        self.layoutIfNeeded()
+
+        var positionTime = calculateTimeForPositionBar(clampedX: clampedX) // Implement this method to convert position to time
+        
+        if positionTime < startTime ?? CMTime.zero {
+            positionTime = startTime ?? CMTime.zero
+        }
+        delegate?.didChangePositionBar(positionTime, StartTime: startTime ?? CMTime.zero, EndTime: endTime ?? CMTime.zero, leftConst: leftConstraint!.constant, rightConst: rightConstraint!.constant)
+    }
+    
+    func calculateTimeForPositionBar(clampedX: CGFloat) -> CMTime {
+        guard let duration = endTime?.seconds else { return .zero }
+
+        // Calculate the percentage of the position bar relative to its total width
+        let totalWidth = rightHandleView.frame.minX - leftHandleView.frame.maxX
+//        let positionX = positionConstraint?.constant ?? 0
+        let positionX = clampedX
+
+        // Calculate the position as a fraction of the total width
+        let fraction = (positionX - leftHandleView.frame.maxX) / totalWidth
+
+        // Calculate the corresponding time based on duration
+        let timeInSeconds = duration * fraction
+        return CMTime(seconds: timeInSeconds, preferredTimescale: 1000)
     }
 
     private func setupGestures() {
