@@ -104,6 +104,9 @@ public protocol TrimmerViewDelegate: AnyObject {
     public let trimView = UIView()
     public let leftHandleView = HandlerView()
     public let rightHandleView = HandlerView()
+    public var isRightHandleLocked: Bool = false
+    public var isLeftHandleLocked: Bool = false
+
     private let positionBar = UIView()
     private let leftHandleKnob = UIView()
     private let rightHandleKnob = UIView()
@@ -265,8 +268,8 @@ public protocol TrimmerViewDelegate: AnyObject {
 
     private func updateMainColor() {
         trimView.layer.borderColor = mainColor.cgColor
-//        leftHandleView.backgroundColor = mainColor
-//        rightHandleView.backgroundColor = mainColor
+        //leftHandleView.backgroundColor = mainColor
+        //rightHandleView.backgroundColor = mainColor
     }
 
     private func updateHandleColor() {
@@ -277,12 +280,12 @@ public protocol TrimmerViewDelegate: AnyObject {
     }
 
     // MARK: - Trim Gestures
-
     @objc func handlePanGesture(_ gestureRecognizer: UIPanGestureRecognizer) {
         guard let view = gestureRecognizer.view, let superView = gestureRecognizer.view?.superview else { return }
         let isLeftGesture = view == leftHandleView
+        
         switch gestureRecognizer.state {
-
+            
         case .began:
             if isLeftGesture {
                 currentLeftConstraint = leftConstraint!.constant
@@ -290,12 +293,34 @@ public protocol TrimmerViewDelegate: AnyObject {
                 currentRightConstraint = rightConstraint!.constant
             }
             updateSelectedTime(stoppedMoving: false)
+            
         case .changed:
             let translation = gestureRecognizer.translation(in: superView)
             if isLeftGesture {
-                updateLeftConstraint(with: translation)
+                // For left handle, check if it's locked and trying to drag outward (to the left)
+                if isLeftHandleLocked {
+                    // Only allow dragging to the right (positive translation = inward)
+                    if translation.x > 0 {
+                        updateLeftConstraint(with: translation)
+                    }
+                    // If translation.x <= 0 (dragging left/outward), do nothing
+                } else {
+                    // Not locked, allow normal dragging
+                    updateLeftConstraint(with: translation)
+                }
             } else {
-                updateRightConstraint(with: translation)
+                // For right handle, check if it's locked and trying to drag outward (to the right)
+                if isRightHandleLocked {
+                    // Only allow dragging to the left (negative translation = inward)
+                    if translation.x < 0 {
+                        updateRightConstraint(with: translation)
+                    }
+                    print("translation.x ==> \(translation.x)")
+                    // If translation.x >= 0 (dragging right/outward), do nothing
+                } else {
+                    // Not locked, allow normal dragging
+                    updateRightConstraint(with: translation)
+                }
             }
             layoutIfNeeded()
             if let startTime = startTime, isLeftGesture {
@@ -304,12 +329,47 @@ public protocol TrimmerViewDelegate: AnyObject {
                 seek(to: endTime)
             }
             updateSelectedTime(stoppedMoving: false)
-
+            
         case .cancelled, .ended, .failed:
             updateSelectedTime(stoppedMoving: true)
+            
         default: break
         }
     }
+    
+    //    @objc func handlePanGesture(_ gestureRecognizer: UIPanGestureRecognizer) {
+    //        guard let view = gestureRecognizer.view, let superView = gestureRecognizer.view?.superview else { return }
+    //        let isLeftGesture = view == leftHandleView
+    //        switch gestureRecognizer.state {
+    //
+    //        case .began:
+    //            if isLeftGesture {
+    //                currentLeftConstraint = leftConstraint!.constant
+    //            } else {
+    //                currentRightConstraint = rightConstraint!.constant
+    //            }
+    //            updateSelectedTime(stoppedMoving: false)
+    
+    //        case .changed:
+    //            let translation = gestureRecognizer.translation(in: superView)
+    //            if isLeftGesture {
+    //                updateLeftConstraint(with: translation)
+    //            } else {
+    //                updateRightConstraint(with: translation)
+    //            }
+    //            layoutIfNeeded()
+    //            if let startTime = startTime, isLeftGesture {
+    //                seek(to: startTime)
+    //            } else if let endTime = endTime {
+    //                seek(to: endTime)
+    //            }
+    //            updateSelectedTime(stoppedMoving: false)
+    //
+    //        case .cancelled, .ended, .failed:
+    //            updateSelectedTime(stoppedMoving: true)
+    //        default: break
+    //        }
+    //    }
 
     private func updateLeftConstraint(with translation: CGPoint) {
         let maxConstraint = max(rightHandleView.frame.origin.x - handleWidth - minimumDistanceBetweenHandle, 0)
@@ -324,7 +384,6 @@ public protocol TrimmerViewDelegate: AnyObject {
     }
 
     // MARK: - Asset loading
-
     override func assetDidChange(newAsset: AVAsset?) {
         super.assetDidChange(newAsset: newAsset)
         resetHandleViewPosition()
